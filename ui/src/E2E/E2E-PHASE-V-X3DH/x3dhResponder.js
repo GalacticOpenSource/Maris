@@ -15,7 +15,7 @@ function concatUint8(...arrays) {
 export async function x3dhResponder(
   I_B_base64, // Bob identity keypair (Ed25519)
   S_B_base64, // Bob signed prekey keypair (X25519)
-  O_B_base64 , // Bob one-time prekey keypair (X25519 | null)
+  O_B_base64, // Bob one-time prekey keypair (X25519 | null)
   I_A_pub_base64, // Alice identity public key (Ed25519)
   E_A_pub_base64 // Alice ephemeral public key (base64)
 ) {
@@ -57,5 +57,8 @@ export async function x3dhResponder(
     ikm: sodium.to_base64(ikm),
     RK: sodium.to_base64(RK),
     CK: sodium.to_base64(CK),
+    header: {
+      ephPub: E_A_pub_base64,
+    },
   };
 }
