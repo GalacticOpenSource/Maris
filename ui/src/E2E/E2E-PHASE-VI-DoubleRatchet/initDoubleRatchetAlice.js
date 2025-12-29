@@ -9,21 +9,21 @@ async function deriveCK(key, info) {
 export async function initDoubleRatchetAlice(RK, E_A) {
   await sodium.ready;
   const RK_I = sodium.from_base64(RK);
-  const CKs = await deriveCK(RK_I , "DR Alice send");
-  const CKr = await deriveCK(RK_I , "DR Alice recv");
+  const CKs = await deriveCK(RK_I, "DR Alice send");
+  const CKr = await deriveCK(RK_I, "DR Alice recv");
 
   return {
-  RK_I: sodium.to_base64(RK_I),
+    RK: sodium.to_base64(RK_I),
     CKr: sodium.to_base64(CKr),
     CKs: sodium.to_base64(CKs),
 
-    DHs: E_A,           // Alice DH keypair (X25519)
-    DHr: null,          // Bob has not replied yet
+    DHs: E_A, // Alice DH keypair (X25519)
+    DHr: null, // Bob has not replied yet
 
     Ns: 0,
     Nr: 0,
-
+    pendingDH: false, // ← REQUIRED
     skippedKeys: new Map(),
-    usedMessageKeys: new Set()
+    usedMessageKeys: new Set(),
   };
 }

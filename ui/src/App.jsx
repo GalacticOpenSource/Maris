@@ -7,12 +7,14 @@ import { loadSignedPrekey } from "./E2E/E2E-PHASE-III-30DAYS-REPEAT/loadSignedPr
 import { generateOneTimePrekeys } from "./E2E/E2E-PHASE-IV-OneTimePrekeys/generateOneTimePrekeys.js";
 import { loadOneTimePrekeys } from "./E2E/E2E-PHASE-IV-OneTimePrekeys/loadOneTimePrekeys.js";
 import { x3dhInitiation } from "./E2E/E2E-PHASE-V-X3DH/x3dhInitiation.js";
+import { x3dhResponder } from "./E2E/E2E-PHASE-V-X3DH/x3dhResponder.js";
 import sodium from "libsodium-wrappers-sumo";
 import { aliceSend } from "./E2E/E2E-SendMessage-I/aliceSend.js";
 import { initDoubleRatchetAlice } from "./E2E/E2E-PHASE-VI-DoubleRatchet/initDoubleRatchetAlice.js";
 import { persistRatchetState } from "./E2E/PersistFullRatchetState-VII/persistRatchetState.js";
 import { bobReceive } from "./E2E/E2E-receiveMessage-I/bobReceive.js";
 import { initDoubleRatchetBob } from "./E2E/E2E-PHASE-VI-DoubleRatchet/initDoubleRatchetBob.js";
+import { bobSend } from "./E2E/E2E-PHASE-VIII/bobSend.js";
 import "./App.css";
 
 function App() {
@@ -68,53 +70,31 @@ function App() {
   // const msg3 = await aliceSend(state, "Are you there?");
   // persistRatchetState(state, storageKey);
   // sendToServer(msg3);
-
+  //N-PsN5B0H3HSqbdkyWpMlhWXAWHXI3mUjrZDFJ_WOBE
   useEffect(() => {
     async function createUser() {
-      let state = await initDoubleRatchetBob(
-        "vgrp6WSSu60dWHBftlW1LYPCtjtdXTarpHOf6A-PeQQ",
-        "pIqpkZAEJDLKFtrzmcwfxljF-RpS_0hALujfl3BDfWQ"
+      const d1 = await x3dhResponder(
+        "o3ary9lVhfSNegl7-2D1nPycth-HO5XOk7mv4Gz9pW6lPjc_z3zmu8Srd2or_Cx6k308ok42BbDs4CfTxRWTrQ",
+        "hub_zpCuX1JKY0eHA4b2FSOvpqdQzGUZyMGLUhEB1lY",
+        "Q6vaaOtSf8CtwNN0RLWIWdO8e0bNtiH_PyqC3F2WIQQ",
+        "ZcgrVa1MFDpRQsVrZwHKpELolsIJZB46YZc5v8Gxunk",
+        "xH51ILb3hDb0amf6l3pIHgrjpCm5_dPLMgCwwhP7ezs"
       );
-            const msg1 = await bobReceive(
+      const state = await initDoubleRatchetBob(d1.RK, d1.header.ephPub);
+      const msg = await bobReceive(
         state,
         {
           body: {
-            nonce: "qTsadePFEk5K3ac13lLmfuip0c4U_3jv",
-            ciphertext: "mKyMLfiupd3TXTvPYGN49p4JAMCUiUPIyw",
+            nonce: "_GLfr2zQiIxjLEqXmPKy5DDus7AO_ko-",
+            ciphertext: "r0or-Z1kWvmnld04woZpsChjEqU2",
           },
-          header: { dh: "pIqpkZAEJDLKFtrzmcwfxljF-RpS_0hALujfl3BDfWQ", n: 0 },
+          header: { dh: "xH51ILb3hDb0amf6l3pIHgrjpCm5_dPLMgCwwhP7ezs", n: 0 },
         },
         "varad"
       );
-         const msg3 = await bobReceive(
-        state,
-        {
-          body: {
-            nonce: "rEgtdfCqCqMn6tZN6SYrttx9I4TQj9Xn",
-            ciphertext: "cqnYv2oYhf-m3ugwt52AuMXnyU7ijsDCavq-Tx53",
-          },
-          header: { dh: "pIqpkZAEJDLKFtrzmcwfxljF-RpS_0hALujfl3BDfWQ", n: 2 },
-        },
-        "varad"
-      );
-
-         const msg2 = await bobReceive(
-        state,
-        {
-          body: {
-            nonce: "7cvPWGJfqBNIEGlrVKBRCx-ssqJwkaKR",
-            ciphertext: "RKt9SOr2n-HRok_qS_giJ4s9oznUjAAsF2n0Iw",
-          },
-          header: { dh: "pIqpkZAEJDLKFtrzmcwfxljF-RpS_0hALujfl3BDfWQ", n: 1 },
-        },
-        "varad"
-      );
-    
-
-
-   
-   
-      return { msg1, msg2, msg3 };
+      state.pendingDH = true;
+      const msg2 = await bobSend(state, "varad", "varad");
+      return msg2;
     }
     console.log(createUser());
   }, []);

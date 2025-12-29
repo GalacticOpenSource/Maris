@@ -2,7 +2,7 @@ import sodium from "libsodium-wrappers-sumo";
 export async function serializeRatchetState(state) {
   await sodium.ready
     return JSON.stringify({
-    RK:state.RK_I,
+    RK:state.RK,
     CKs: state.CKs,
     CKr: state.CKr,
 
