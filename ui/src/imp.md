@@ -1,4 +1,15 @@
 
+# imp X3DH runs once
+
+Send → DH ratchet
+
+Receive → derive CKr
+
+pendingDH controls DH rotation
+
+All crypto uses raw bytes
+
+Base64 only for storage/transport
 # Curve25519 has two representations:
 
 Representation	Used for	Name

@@ -3,21 +3,36 @@ import { kdfRK } from "./kdfRK.js";
 
 export async function dhRatchet(state) {
   await sodium.ready;
-  // console.log(state)
+
+  /* ---------------------------------- */
+  /* 1. Generate NEW DH keypair         */
+  /* ---------------------------------- */
+
   const DHs_new = sodium.crypto_kx_keypair();
-  const publicKey = sodium.from_base64(state.DHr);
+
+  /* ---------------------------------- */
+  /* 2. Perform DH with peer            */
+  /* ---------------------------------- */
+
   const DH = sodium.crypto_scalarmult(
     DHs_new.privateKey,
-    publicKey // peer DH public key
+    state.DHr            // ← already Uint8Array
   );
-console.log(" DHs_new",sodium.to_base64(DHs_new.privateKey))
+
+  /* ---------------------------------- */
+  /* 3. Derive new RK + CKs             */
+  /* ---------------------------------- */
+
   const { newRK, CK } = await kdfRK(state.RK, DH);
-  // console.log(newRK)
-  state.RK =  newRK;
+
+  state.RK = newRK;
   state.CKs = CK;
-  state.DHs = DHs_new.publicKey; // ✅ full keypair
+
+  /* ---------------------------------- */
+  /* 4. Update ratchet state            */
+  /* ---------------------------------- */
+
+  state.DHs = DHs_new;   // full keypair
   state.Ns = 0;
   state.pendingDH = false;
- 
-  return state;
 }

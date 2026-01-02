@@ -89,6 +89,7 @@ const senderDh = sodium.from_base64(dhPubBase64);
     // Ns / Nr
     // If YES → call persistRatchetState
     // If NO → don’t
+       state.pendingDH = true; 
     persistRatchetState(state, storageKey); // ← consume skipped key
 
     return plaintext;

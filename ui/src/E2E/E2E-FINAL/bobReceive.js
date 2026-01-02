@@ -44,6 +44,7 @@ export async function bobReceive(state, message, storageKey) {
     const plaintext = decryptWithMK(skippedMK, body);
 
     state.usedMessageKeys.add(replayKey);
+    state.pendingDH = true; // receiving counts as a turn change
     persistRatchetState(state, storageKey);
 
     return plaintext;
@@ -105,6 +106,7 @@ export async function bobReceive(state, message, storageKey) {
 
   const plaintext = decryptWithMK(MK, body);
   state.usedMessageKeys.add(replayKey);
+ state.pendingDH = true; // receiving always triggers next-send DH
 
   persistRatchetState(state, storageKey);
 
