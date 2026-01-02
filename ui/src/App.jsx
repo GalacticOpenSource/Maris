@@ -15,6 +15,9 @@ import { persistRatchetState } from "./E2E/PersistFullRatchetState-VII/persistRa
 import { bobReceive } from "./E2E/E2E-receiveMessage-I/bobReceive.js";
 import { initDoubleRatchetBob } from "./E2E/E2E-PHASE-VI-DoubleRatchet/initDoubleRatchetBob.js";
 import { bobSend } from "./E2E/E2E-PHASE-VIII/bobSend.js";
+import EmailLogin from "./Register/EmailLogin.jsx";
+import RegisterDevice from "./Register/RegisterDevice.jsx";
+import OtpVerify from "./Register/OtpVerify.jsx";
 import "./App.css";
 
 function App() {
@@ -71,33 +74,33 @@ function App() {
   // persistRatchetState(state, storageKey);
   // sendToServer(msg3);
   //N-PsN5B0H3HSqbdkyWpMlhWXAWHXI3mUjrZDFJ_WOBE
-  useEffect(() => {
-    async function createUser() {
-      const d1 = await x3dhResponder(
-        "o3ary9lVhfSNegl7-2D1nPycth-HO5XOk7mv4Gz9pW6lPjc_z3zmu8Srd2or_Cx6k308ok42BbDs4CfTxRWTrQ",
-        "hub_zpCuX1JKY0eHA4b2FSOvpqdQzGUZyMGLUhEB1lY",
-        "Q6vaaOtSf8CtwNN0RLWIWdO8e0bNtiH_PyqC3F2WIQQ",
-        "ZcgrVa1MFDpRQsVrZwHKpELolsIJZB46YZc5v8Gxunk",
-        "xH51ILb3hDb0amf6l3pIHgrjpCm5_dPLMgCwwhP7ezs"
-      );
-      const state = await initDoubleRatchetBob(d1.RK, d1.header.ephPub);
-      const msg = await bobReceive(
-        state,
-        {
-          body: {
-            nonce: "_GLfr2zQiIxjLEqXmPKy5DDus7AO_ko-",
-            ciphertext: "r0or-Z1kWvmnld04woZpsChjEqU2",
-          },
-          header: { dh: "xH51ILb3hDb0amf6l3pIHgrjpCm5_dPLMgCwwhP7ezs", n: 0 },
-        },
-        "varad"
-      );
-      state.pendingDH = true;
-      const msg2 = await bobSend(state, "varad", "varad");
-      return msg2;
-    }
-    console.log(createUser());
-  }, []);
+  // useEffect(() => {
+  //   async function createUser() {
+  //     const d1 = await x3dhResponder(
+  //       "o3ary9lVhfSNegl7-2D1nPycth-HO5XOk7mv4Gz9pW6lPjc_z3zmu8Srd2or_Cx6k308ok42BbDs4CfTxRWTrQ",
+  //       "hub_zpCuX1JKY0eHA4b2FSOvpqdQzGUZyMGLUhEB1lY",
+  //       "Q6vaaOtSf8CtwNN0RLWIWdO8e0bNtiH_PyqC3F2WIQQ",
+  //       "ZcgrVa1MFDpRQsVrZwHKpELolsIJZB46YZc5v8Gxunk",
+  //       "xH51ILb3hDb0amf6l3pIHgrjpCm5_dPLMgCwwhP7ezs"
+  //     );
+  //     const state = await initDoubleRatchetBob(d1.RK, d1.header.ephPub);
+  //     const msg = await bobReceive(
+  //       state,
+  //       {
+  //         body: {
+  //           nonce: "_GLfr2zQiIxjLEqXmPKy5DDus7AO_ko-",
+  //           ciphertext: "r0or-Z1kWvmnld04woZpsChjEqU2",
+  //         },
+  //         header: { dh: "xH51ILb3hDb0amf6l3pIHgrjpCm5_dPLMgCwwhP7ezs", n: 0 },
+  //       },
+  //       "varad"
+  //     );
+  //     state.pendingDH = true;
+  //     const msg2 = await bobSend(state, "varad", "varad");
+  //     return msg2;
+  //   }
+  //   console.log(createUser());
+  // }, []);
 
   // imp
   //   On app restart:
@@ -117,7 +120,9 @@ function App() {
   // When Alice receives this:
   // removeFromOutbox(mid);
   // That’s it.
-  return <></>;
+  return <>
+  <OtpVerify/>
+  </>;
 }
 
 export default App;
