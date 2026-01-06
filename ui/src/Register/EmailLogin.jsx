@@ -8,7 +8,8 @@ export default function EmailLogin() {
   const res =  await fetch("http://localhost:3000/auth/user",{
         method:"POST",
         headers:{ "Content-Type": "application/json"},
-        body: JSON.stringify({email})
+        body: JSON.stringify({email}),
+        credentials: "include"
     })
     if(!res.ok){
         const err = await res.json()

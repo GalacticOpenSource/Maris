@@ -17,12 +17,22 @@ import { initDoubleRatchetBob } from "./E2E/E2E-PHASE-VI-DoubleRatchet/initDoubl
 import { bobSend } from "./E2E/E2E-PHASE-VIII/bobSend.js";
 import EmailLogin from "./Register/EmailLogin.jsx";
 import RegisterDevice from "./Register/RegisterDevice.jsx";
+import ListDevices from "./pages/ListDevices.jsx";
 import OtpVerify from "./Register/OtpVerify.jsx";
+import { useAuth } from "./auth/AuthProvider.jsx";
+
 import "./App.css";
 
 function App() {
   const [count, setCount] = useState(0);
   const [data, setData] = useState(null);
+const{isAuthenticated}= useAuth()
+useEffect(()=>{
+  if(!isAuthenticated) return
+   bootstrapKeys();// 🔐 KEY BOOTSTRAP
+},[isAuthenticated])
+
+
   // after app start
 
   //   1) Ratchet state  → cryptographic safety
@@ -121,7 +131,7 @@ function App() {
   // removeFromOutbox(mid);
   // That’s it.
   return <>
-  <OtpVerify/>
+  <ListDevices/>
   </>;
 }
 

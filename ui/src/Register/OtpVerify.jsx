@@ -1,23 +1,47 @@
 import { useEffect, useState } from "react";
 import "./auth.css";
-
+import { useAuth } from "../auth/AuthProvider";
 export default function OtpVerify() {
+  const { setIsAuthenticated } = useAuth()
   const [timeLeft, setTimeLeft] = useState(5 * 60); // 5 minutes in seconds
-const [otp,setOtp] = useState("")
+  const [otp, setOtp] = useState("");
+  const deviceId = localStorage.getItem("device_id");
+  function getDeviceName() {
+    const ua = navigator.userAgent;
 
-  async function  registerOtp(otp) {
-  const res =  await fetch("http://localhost:3000/otp/user/",{
-        method:"POST",
-        headers:{ "Content-Type": "application/json"},
-        body: JSON.stringify({otp,email:"bmr74242@gmail.com"})
-    })
-    if(!res.ok){
-        const err = await res.json()
-   throw new Error(`Device registration failed: ${err}`);
+    if (ua.includes("Windows")) return "Chrome on Windows";
+    if (ua.includes("Mac")) return "Chrome on macOS";
+    if (ua.includes("Linux")) return "Chrome on Linux";
+    if (ua.includes("Android")) return "Android Device";
+    if (ua.includes("iPhone")) return "iPhone";
+
+    return "Unknown Device";
+  }
+
+  const deviceName = getDeviceName();
+
+  async function registerOtp(otp) {
+    const res = await fetch("http://localhost:3000/otp/user/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        otp,
+        email: "bmr74242@gmail.com",
+        deviceName,
+        deviceId,
+      }),
+      credentials: "include",
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(`Device registration failed: ${err}`);
     }
-    const data = await res.json()
-    console.log(data)
-    return data
+    const data = await res.json();
+    localStorage.setItem("device_id", data.deviceId);
+  // 🔥 THIS triggers App.jsx useEffect
+    setIsAuthenticated(true);
+    console.log(data);
+    return data;
   }
   useEffect(() => {
     if (timeLeft <= 0) return;
@@ -36,9 +60,7 @@ const [otp,setOtp] = useState("")
     <div className="auth-container">
       <div className="auth-card">
         <h1 className="auth-title">Verify code</h1>
-        <p className="auth-text">
-          Enter the 6-digit code sent to your email
-        </p>
+        <p className="auth-text">Enter the 6-digit code sent to your email</p>
 
         <div className="auth-form">
           <input
@@ -49,13 +71,17 @@ const [otp,setOtp] = useState("")
             maxLength={6}
             autoComplete="one-time-code"
             placeholder="••••••"
-            onChange={(e)=>{
-              setOtp(e.target.value)
+            onChange={(e) => {
+              setOtp(e.target.value);
             }}
           />
-    <button type="button" onClick={()=>{
-            registerOtp(otp)
-          }} disabled={!otp}>
+          <button
+            type="button"
+            onClick={() => {
+              registerOtp(otp);
+            }}
+            disabled={!otp}
+          >
             Continue
           </button>
         </div>

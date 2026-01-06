@@ -4,14 +4,22 @@ export async function generateSignedPrekey(identitykey_private, passphrase) {
   await sodium.ready;
   // X25519 (Curve25519 Diffie-Hellman)
   const signedPrekey = sodium.crypto_kx_keypair()
-    const response = await fetch("http://localhost:8080/data", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        bAlicepublicKeys1: sodium.to_base64(signedPrekey.publicKey),
-        bAliceprivateKeys2: sodium.to_base64(signedPrekey.privateKey),
-      }),
-    });
+  // 30 days in milliseconds
+const SIGNED_PREKEY_LIFETIME = 30 * 24 * 60 * 60 * 1000;
+
+const expiresAt = new Date(Date.now() + SIGNED_PREKEY_LIFETIME).toISOString();
+
+console.log(expiresAt);
+// "2026-02-10T12:00:00.000Z" (example)
+
+    // const response = await fetch("http://localhost:8080/data", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({
+    //     bAlicepublicKeys1: sodium.to_base64(signedPrekey.publicKey),
+    //     bAliceprivateKeys2: sodium.to_base64(signedPrekey.privateKey),
+    //   }),
+    // });
   //Algorithm Ed25519
   //Create digital signature
   //crypto_sign_detached proves “this data really came from me and was not changed”
@@ -52,6 +60,7 @@ export async function generateSignedPrekey(identitykey_private, passphrase) {
     nonce: sodium.to_base64(nonce),
     salt: sodium.to_base64(salt), // store locally 30 days
     signature: sodium.to_base64(signature), // upload to serve
+    expiresAt,
   };
   
   localStorage.setItem("Signed_key_encrypted", JSON.stringify(data));
