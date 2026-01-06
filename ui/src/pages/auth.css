@@ -1,0 +1,336 @@
+/* =====================================================
+   RESET + GLOBAL FIXES
+===================================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+}
+
+html {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden; /* Windows scrollbar fix */
+}
+
+body {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* =====================================================
+   COLOR SYSTEM (DEFAULT = DARK)
+===================================================== */
+:root {
+  --bg: #0b0f14;
+  --card-bg: #121826;
+  --border: #1f2937;
+
+  --text-main: #e5e7eb;
+  --text-muted: #9ca3af;
+  --placeholder: #6b7280;
+
+  --input-bg: #0b0f14;
+
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+
+  --success: #22c55e;
+}
+
+/* =====================================================
+   LIGHT MODE (AUTO)
+===================================================== */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f9fafb;
+    --card-bg: #ffffff;
+    --border: #e5e7eb;
+
+    --text-main: #111827;
+    --text-muted: #6b7280;
+    --placeholder: #9ca3af;
+
+    --input-bg: #f9fafb;
+  }
+}
+
+/* =====================================================
+   BODY
+===================================================== */
+body {
+  background-color: var(--bg);
+  color: var(--text-main);
+}
+
+/* =====================================================
+   LAYOUT
+===================================================== */
+.auth-container {
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 16px;
+
+  /* Visual centering (important on large screens) */
+  background:
+    radial-gradient(
+      600px circle at center,
+      rgba(37, 99, 235, 0.08),
+      transparent 60%
+    );
+}
+
+/* =====================================================
+   CARD
+===================================================== */
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+
+  background: var(--card-bg);
+  padding: clamp(20px, 5vw, 32px);
+  border-radius: 16px;
+
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.12),
+    0 0 0 1px var(--border);
+}
+
+/* =====================================================
+   TEXT
+===================================================== */
+.auth-title {
+  font-size: clamp(20px, 4.5vw, 22px);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.auth-text {
+  font-size: clamp(13px, 3.5vw, 14px);
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  line-height: 1.4;
+}
+
+.auth-note {
+  margin-top: 16px;
+  font-size: clamp(11px, 3vw, 12px);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* =====================================================
+   FORM ELEMENTS
+===================================================== */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--text-main);
+  font-size: 15px;
+}
+
+.auth-form input::placeholder {
+  color: var(--placeholder);
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+.auth-form button,
+.device-revoke-btn {
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-form button {
+  background: var(--primary);
+  color: white;
+}
+
+.auth-form button:hover {
+  background: var(--primary-hover);
+}
+
+.auth-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =====================================================
+   DEVICE LIST
+===================================================== */
+.device-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.device-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+}
+
+.device-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.device-name {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.device-status {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.device-status.active {
+  color: var(--success);
+}
+
+.device-status.revoked {
+  color: var(--danger);
+}
+
+.device-revoke-btn {
+  background: transparent;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  padding: 6px 12px;
+}
+
+.device-revoke-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.device-revoke-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =====================================================
+   MODAL (DANGER CONFIRMATION)
+===================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  background: rgba(0, 0, 0, 0.6);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 16px;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 420px;
+
+  background: var(--card-bg);
+  padding: 24px;
+  border-radius: 16px;
+
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    0 0 0 1px var(--border);
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.modal-text {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.modal-warning {
+  font-size: 13px;
+  color: var(--danger);
+  margin-bottom: 20px;
+}
+
+/* =====================================================
+   MODAL ACTIONS
+===================================================== */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.modal-cancel {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.modal-danger {
+  background: var(--danger);
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modal-danger:hover {
+  background: var(--danger-hover);
+}
+
+/* =====================================================
+   LARGE SCREENS
+===================================================== */
+@media (min-width: 768px) {
+  .auth-card {
+    border-radius: 18px;
+  }
+}

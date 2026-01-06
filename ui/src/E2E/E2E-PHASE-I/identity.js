@@ -8,17 +8,17 @@ export async function createIdentity(passphrase) {
 
   //  Ed25519 identity keypair
   const id = sodium.crypto_sign_keypair();
-  const response = await fetch("http://localhost:8080/data", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      bAlicepublicKeyi1: sodium.to_base64(id.publicKey),
-      bAliceprivateKeyi2: sodium.to_base64(id.privateKey),
-    }),
-  });
+  // const response = await fetch("http://localhost:8080/data", {
+  //   method: "POST",
+  //   headers: { "Content-Type": "application/json" },
+  //   body: JSON.stringify({
+  //     bAlicepublicKeyi1: sodium.to_base64(id.publicKey),
+  //     bAliceprivateKeyi2: sodium.to_base64(id.privateKey),
+  //   }),
+  // });
 
-  const d = await response.json();
-  console.log(d);
+  // const d = await response.json();
+  // console.log(d);
   // 2. derive encryption key from passphrase
   const salt = sodium.randombytes_buf(16);
   const encKey = sodium.crypto_pwhash(
@@ -53,5 +53,5 @@ export async function createIdentity(passphrase) {
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 
-  return data;
+  return {data};
 }
