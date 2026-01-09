@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 
 app.use(express.json({ limit: "50kb" }));
 app.use(cookieParser());
-export async function auth(req, res, next) {
+export  async function auth(req, res, next) {
   const token = req.cookies.session;
   console.log(token);
   if (!token) return res.sendStatus(401);

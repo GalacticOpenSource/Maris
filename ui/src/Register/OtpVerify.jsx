@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import "./auth.css";
 import { useAuth } from "../auth/AuthProvider";
+import { useNavigate } from "react-router-dom";
+import "./auth.css";
 export default function OtpVerify() {
-  const { setIsAuthenticated } = useAuth()
+  const { setIsAuthenticated } = useAuth();
   const [timeLeft, setTimeLeft] = useState(5 * 60); // 5 minutes in seconds
   const [otp, setOtp] = useState("");
+  const navigate = useNavigate();
+  const { emaildata } = useAuth();
   const deviceId = localStorage.getItem("device_id");
   function getDeviceName() {
     const ua = navigator.userAgent;
@@ -21,12 +24,12 @@ export default function OtpVerify() {
   const deviceName = getDeviceName();
 
   async function registerOtp(otp) {
-    const res = await fetch("http://localhost:3000/otp/user/", {
+    const res = await fetch("http://localhost:3000/otp/user", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         otp,
-        email: "bmr74242@gmail.com",
+        email: emaildata,
         deviceName,
         deviceId,
       }),
@@ -38,10 +41,10 @@ export default function OtpVerify() {
     }
     const data = await res.json();
     localStorage.setItem("device_id", data.deviceId);
-  // 🔥 THIS triggers App.jsx useEffect
+    // 🔥 THIS triggers App.jsx useEffect
     setIsAuthenticated(true);
     console.log(data);
-    return data;
+    navigate("/CreatePassphrase");
   }
   useEffect(() => {
     if (timeLeft <= 0) return;
