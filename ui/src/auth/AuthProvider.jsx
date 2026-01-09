@@ -3,12 +3,14 @@ import SplashScreen from '../pages/SplashScreen';
 const AuthContext =  createContext(null)
 export function   AuthProvider({ children }) {
     const [isAuthenticated, setIsAuthenticated]= useState(false)
+      const [storageKey, setStorageKey] = useState(null);
+            const [emaildata, setEmaildata] = useState(null);
    const [loading, setLoading] = useState(true);
    // Check session on app load / refresh
    useEffect(()=>{
     async function checkSession() {
         try{
-            const res = fetch("/me",{
+            const res = fetch("http://localhost:3000/me",{
           credentials: "include"
         })
           if(res.ok){
@@ -25,7 +27,7 @@ export function   AuthProvider({ children }) {
     checkSession()
    },[])
  return (
-  <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+  <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated,storageKey, setStorageKey ,emaildata, setEmaildata}}>
     {loading ? <SplashScreen /> : children}
   </AuthContext.Provider>
 );

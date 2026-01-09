@@ -1,68 +1,73 @@
 import sodium from "libsodium-wrappers-sumo";
-//function will run every 30 days
-export async function generateSignedPrekey(identitykey_private, passphrase) {
+
+// runs every ~30 days
+export async function generateSignedPrekey(
+  identityEd25519PrivateKey,
+  storageKey
+) {
   await sodium.ready;
-  // X25519 (Curve25519 Diffie-Hellman)
-  const signedPrekey = sodium.crypto_kx_keypair()
-  // 30 days in milliseconds
-const SIGNED_PREKEY_LIFETIME = 30 * 24 * 60 * 60 * 1000;
 
-const expiresAt = new Date(Date.now() + SIGNED_PREKEY_LIFETIME).toISOString();
+  if (!storageKey) {
+    throw new Error("Missing storage key");
+  }
 
-console.log(expiresAt);
-// "2026-02-10T12:00:00.000Z" (example)
+  /* --------------------------------------------------
+     1️⃣ Generate X25519 signed prekey
+  -------------------------------------------------- */
+  const signedPrekey = sodium.crypto_kx_keypair();
 
-    // const response = await fetch("http://localhost:8080/data", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({
-    //     bAlicepublicKeys1: sodium.to_base64(signedPrekey.publicKey),
-    //     bAliceprivateKeys2: sodium.to_base64(signedPrekey.privateKey),
-    //   }),
-    // });
-  //Algorithm Ed25519
-  //Create digital signature
-  //crypto_sign_detached proves “this data really came from me and was not changed”
-  //  — it does NOT encrypt anything.
-  const salt = sodium.randombytes_buf(16);
-  const encKey = sodium.crypto_pwhash(
-    sodium.crypto_secretbox_KEYBYTES, // 32-byte key
-    sodium.from_string(passphrase), // user pswd
-    salt, // same password + different salt → different key
-    sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE, // how many CPU operations are used
-    sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE, //how much RAM is used
-    sodium.crypto_pwhash_ALG_DEFAULT // Argon2id
+  /* --------------------------------------------------
+     2️⃣ Expiration (rotation metadata)
+  -------------------------------------------------- */
+  const SIGNED_PREKEY_LIFETIME =
+    30 * 24 * 60 * 60 * 1000; // 30 days
+
+  const expiresAt = new Date(
+    Date.now() + SIGNED_PREKEY_LIFETIME
+  ).toISOString();
+
+  /* --------------------------------------------------
+     3️⃣ Encrypt private key USING storageKey
+  -------------------------------------------------- */
+  const nonce = sodium.randombytes_buf(
+    sodium.crypto_secretbox_NONCEBYTES
   );
-  // 3. encrypt the private key
-  const nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
-  //crypto_secretbox_easy uses XSalsa20,
-  // which is a stream cipher that generates random bytes and XORs them with the plaintext.
-  //  It then uses Poly1305, which is a MAC, to create an authentication tag.
-  // The output is a single ciphertext that contains both the MAC and the encrypted data.
+
   const cipher = sodium.crypto_secretbox_easy(
     signedPrekey.privateKey,
     nonce,
-    encKey
+    storageKey
   );
-  //crypto_sign_detached	Create digital signature
-//Input	message + private signing key
-//Output	signature (64 bytes)
-//Algorithm	Ed25519
-//Purpose	Prove identity & integrity
 
+  /* --------------------------------------------------
+     4️⃣ Sign public key using identity (Ed25519)
+  -------------------------------------------------- */
   const signature = sodium.crypto_sign_detached(
     signedPrekey.publicKey,
-    identitykey_private
+    identityEd25519PrivateKey
   );
-  const data = {
+
+  /* --------------------------------------------------
+     5️⃣ Store locally (NO salt, NO passphrase)
+  -------------------------------------------------- */
+  const localData = {
     publicKey: sodium.to_base64(signedPrekey.publicKey),
     cipher: sodium.to_base64(cipher),
     nonce: sodium.to_base64(nonce),
-    salt: sodium.to_base64(salt), // store locally 30 days
-    signature: sodium.to_base64(signature), // upload to serve
-    expiresAt,
+    expiresAt
   };
-  
-  localStorage.setItem("Signed_key_encrypted", JSON.stringify(data));
-  return  data
+
+  localStorage.setItem(
+    "signed_prekey",
+    JSON.stringify(localData)
+  );
+
+  /* --------------------------------------------------
+     6️⃣ Upload ONLY public data to server
+  -------------------------------------------------- */
+  return {
+    publicKey: sodium.to_base64(signedPrekey.publicKey),
+    signature: sodium.to_base64(signature),
+    expiresAt
+  };
 }

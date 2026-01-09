@@ -1,4 +1,4 @@
-async function signedPrekeyExpiringSoon() {
+export async function signedPrekeyExpiringSoon() {
   const res = await fetch("keys/signed-prekey/latest", {
     credentials: "include",
   });

@@ -5,7 +5,7 @@ import { loadIdentity } from "./E2E/E2E-PHASE-II/loadIdentity.JS";
 import { generateSignedPrekey } from "./E2E/E2E-PHASE-III-30DAYS-REPEAT/generateSignedPrekey.js";
 import { loadSignedPrekey } from "./E2E/E2E-PHASE-III-30DAYS-REPEAT/loadSignedPrekey.js";
 import { generateOneTimePrekeys } from "./E2E/E2E-PHASE-IV-OneTimePrekeys/generateOneTimePrekeys.js";
-import { loadOneTimePrekeys } from "./E2E/E2E-PHASE-IV-OneTimePrekeys/loadOneTimePrekeys.js";
+import Home from "./Register/Home.jsx";
 import { x3dhInitiation } from "./E2E/E2E-PHASE-V-X3DH/x3dhInitiation.js";
 import { x3dhResponder } from "./E2E/E2E-PHASE-V-X3DH/x3dhResponder.js";
 import sodium from "libsodium-wrappers-sumo";
@@ -19,19 +19,32 @@ import EmailLogin from "./Register/EmailLogin.jsx";
 import RegisterDevice from "./Register/RegisterDevice.jsx";
 import ListDevices from "./pages/ListDevices.jsx";
 import OtpVerify from "./Register/OtpVerify.jsx";
+import CreatePassphrase from "./pages/CreatePassphrase.jsx";
+import { Routes, Route } from "react-router-dom";
+import ConfirmPassphrase from "./pages/ConfirmPassphrase.jsx";
+import UnlockPassphrase from "./pages/UnlockPassphrase.jsx";
 import { useAuth } from "./auth/AuthProvider.jsx";
+import { bootstrapKeys } from "./crypto/bootstrapKeys.js";
+
 
 import "./App.css";
 
 function App() {
   const [count, setCount] = useState(0);
   const [data, setData] = useState(null);
-const{isAuthenticated}= useAuth()
-useEffect(()=>{
-  if(!isAuthenticated) return
-   bootstrapKeys();// 🔐 KEY BOOTSTRAP
-},[isAuthenticated])
+  const { isAuthenticated, storageKey } = useAuth();
+  console.log(isAuthenticated);
+  console.log(storageKey);
+  useEffect(() => {
 
+    console.log("running 1");
+    if (!isAuthenticated) return;
+    console.log("running 2");
+    if (!storageKey) return;
+console.log("running 3");
+console.log(storageKey);
+    bootstrapKeys(storageKey);
+  }, [isAuthenticated, storageKey]);
 
   // after app start
 
@@ -130,9 +143,16 @@ useEffect(()=>{
   // When Alice receives this:
   // removeFromOutbox(mid);
   // That’s it.
-  return <>
-  <ListDevices/>
-  </>;
+  return (
+    <Routes>
+      <Route path="/" element={<EmailLogin/>} />
+      <Route path="/Otp" element={<OtpVerify/>} />
+      <Route path="/CreatePassphrase" element={<CreatePassphrase />} />
+      <Route path="/confirm-passphrase" element={<ConfirmPassphrase />} />
+      <Route path="/ok" element={<UnlockPassphrase />} />
+      <Route path="/app" element={<Home/>} />
+    </Routes>
+  );
 }
 
 export default App;

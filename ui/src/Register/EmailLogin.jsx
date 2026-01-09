@@ -1,23 +1,28 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthProvider";
 import "./auth.css";
 
 export default function EmailLogin() {
   const [email, setEmail] = useState("");
+   const navigate = useNavigate();
+   const {setEmaildata} = useAuth()
   console.log(email);
-  async function  registerDevice(email) {
-  const res =  await fetch("http://localhost:3000/auth/user",{
-        method:"POST",
-        headers:{ "Content-Type": "application/json"},
-        body: JSON.stringify({email}),
-        credentials: "include"
-    })
-    if(!res.ok){
-        const err = await res.json()
-   throw new Error(`Device registration failed: ${err}`);
+  async function registerDevice(email) {
+    const res = await fetch("http://localhost:3000/auth/user", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+      credentials: "include",
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(`Device registration failed: ${err}`);
     }
-    const data = await res.json()
-    console.log(data)
-    return data
+    const data = await res.json();
+    console.log(data);
+setEmaildata(email)
+    navigate("/Otp");
   }
 
   return (
@@ -37,9 +42,13 @@ export default function EmailLogin() {
             autoComplete="email"
           />
 
-          <button type="button" onClick={()=>{
-            registerDevice(email)
-          }} disabled={!email}>
+          <button
+            type="button"
+            onClick={() => {
+              registerDevice(email);
+            }}
+            disabled={!email}
+          >
             Continue
           </button>
         </div>
