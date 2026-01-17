@@ -1,25 +1,24 @@
 import sodium from "libsodium-wrappers-sumo";
-export async function serializeRatchetState(state) {
-  await sodium.ready
-    return JSON.stringify({
-    RK:state.RK,
-    CKs: state.CKs,
-    CKr: state.CKr,
+export function serializeRatchetState(state) {
+  return JSON.stringify({
+    RK: sodium.to_base64(state.RK),
+    CKs: sodium.to_base64(state.CKs),
+    CKr: sodium.to_base64(state.CKr),
 
     DHs: {
-      publicKey: state.DHs
+      publicKey: sodium.to_base64(state.DHs.publicKey),
+      privateKey: sodium.to_base64(state.DHs.privateKey)
     },
 
-    DHr: state.DHr ? state.DHr : null,
+    DHr: state.DHr ? sodium.to_base64(state.DHr) : null,
 
     Ns: state.Ns,
     Nr: state.Nr,
 
-    skippedKeys: Array.from(state.skippedKeys.entries()).map(([k, v]) => [
-      k,
-      sodium.to_base64(v),
-    ]),
+    skippedKeys: Array.from(state.skippedKeys.entries()).map(
+      ([k, v]) => [k, sodium.to_base64(v)]
+    ),
 
-    usedMessageKeys: Array.from(state.usedMessageKeys),
+    usedMessageKeys: Array.from(state.usedMessageKeys)
   });
 }

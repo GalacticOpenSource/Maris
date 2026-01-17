@@ -13,17 +13,21 @@ export async function bootstrapKeys(storageKey) {
   if (!localStorage.getItem("identity_key_encrypted")) {
     console.log("runnig ok odne");
     const { publicKey } = await createIdentity(storageKey);
+    console.log(publicKey)
     await uploadIdentityKey(publicKey);
   }
   // 2️⃣ Signed prekey (rotate)
   if (await signedPrekeyExpiringSoon()) {
     const { privateKey } = await loadIdentity(storageKey);
+    console.log(privateKey)
     const spk = await generateSignedPrekey(privateKey, storageKey);
+    console.log(spk)
     await uploadSignedPreKey(spk);
   }
     // 3️⃣ One-time prekeys (batch)
   if (await oneTimePrekeysLow()) {
     const publicKeys = await generateOneTimePrekeys(101, storageKey);
+    console.log(publicKeys)
     await uploadOneTimePreKeys(publicKeys);
   }
 }

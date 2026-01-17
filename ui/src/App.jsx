@@ -14,7 +14,7 @@ import { initDoubleRatchetAlice } from "./E2E/E2E-PHASE-VI-DoubleRatchet/initDou
 import { persistRatchetState } from "./E2E/PersistFullRatchetState-VII/persistRatchetState.js";
 import { bobReceive } from "./E2E/E2E-receiveMessage-I/bobReceive.js";
 import { initDoubleRatchetBob } from "./E2E/E2E-PHASE-VI-DoubleRatchet/initDoubleRatchetBob.js";
-import { bobSend } from "./E2E/E2E-PHASE-VIII/bobSend.js";
+import ChatLayout from "./Chat/ChatLayout.jsx";
 import EmailLogin from "./Register/EmailLogin.jsx";
 import RegisterDevice from "./Register/RegisterDevice.jsx";
 import ListDevices from "./pages/ListDevices.jsx";
@@ -24,27 +24,35 @@ import { Routes, Route } from "react-router-dom";
 import ConfirmPassphrase from "./pages/ConfirmPassphrase.jsx";
 import UnlockPassphrase from "./pages/UnlockPassphrase.jsx";
 import { useAuth } from "./auth/AuthProvider.jsx";
+import { fetchKeyBundlename } from "./api/Alice_Bob.js";
+import { RequireUnlocked } from "./pages/RequireUnlocked.jsx";
 import { bootstrapKeys } from "./crypto/bootstrapKeys.js";
-
-
+import { chats as initialChats } from "./data/fakeChats.js";
+import { useIsMobile } from "./hooks/useIsMobile.js";
+import ChatList from "./components/ChatList/ChatList.jsx";
+import ChatScreen from "./components/ChatScreen/ChatScreen.jsx";
 import "./App.css";
-
 function App() {
-  const [count, setCount] = useState(0);
-  const [data, setData] = useState(null);
-  const { isAuthenticated, storageKey } = useAuth();
-  console.log(isAuthenticated);
-  console.log(storageKey);
-  useEffect(() => {
+  const isMobile = useIsMobile();
+  const [chats, setChats] = useState(initialChats);
+  const [activeChatId, setActiveChatId] = useState(null);
 
-    console.log("running 1");
-    if (!isAuthenticated) return;
-    console.log("running 2");
-    if (!storageKey) return;
-console.log("running 3");
-console.log(storageKey);
-    bootstrapKeys(storageKey);
-  }, [isAuthenticated, storageKey]);
+  const activeChat = chats.find((c) => c.id === activeChatId);
+
+  // const [count, setCount] = useState(0);
+  // const [data, setData] = useState(null);
+  // const { isAuthenticated, storageKey } = useAuth();
+  // console.log(isAuthenticated);
+  // console.log(storageKey);
+  // useEffect(() => {
+  //   console.log("running 1");
+  //   if (!isAuthenticated) return;
+  //   console.log("running 2");
+  //   if (!storageKey) return;
+  //   console.log("running 3");
+  //   console.log(storageKey);
+  //   bootstrapKeys(storageKey);
+  // }, [isAuthenticated, storageKey]);
 
   // after app start
 
@@ -144,14 +152,45 @@ console.log(storageKey);
   // removeFromOutbox(mid);
   // That’s it.
   return (
-    <Routes>
-      <Route path="/" element={<EmailLogin/>} />
-      <Route path="/Otp" element={<OtpVerify/>} />
-      <Route path="/CreatePassphrase" element={<CreatePassphrase />} />
-      <Route path="/confirm-passphrase" element={<ConfirmPassphrase />} />
-      <Route path="/ok" element={<UnlockPassphrase />} />
-      <Route path="/app" element={<Home/>} />
-    </Routes>
+    <div className="app">
+      {/* Chat List */}
+      {(!isMobile || !activeChat) && (
+        <ChatList
+          chats={chats}
+          activeChatId={activeChatId}
+          onSelectChat={setActiveChatId}
+        />
+      )}
+
+      {/* Chat Screen */}
+      {activeChat && (
+        <ChatScreen
+          chat={activeChat}
+          setChats={setChats}
+          isMobile={isMobile}
+          onBack={() => setActiveChatId(null)}
+        />
+      )}
+    </div>
+
+    // {/* <ChatLayout/> */}
+
+    // <Routes>
+    //   <Route path="/" element={<EmailLogin />} />
+    //   <Route path="/Otp" element={<OtpVerify />} />
+    //   <Route path="/CreatePassphrase" element={<CreatePassphrase />} />
+    //   <Route path="/confirm-passphrase" element={<ConfirmPassphrase />} />
+    //   <Route path="/ok" element={<UnlockPassphrase />} />
+    //   <Route path="/ld" element={<ListDevices />} />
+    //   <Route
+    //     path="/app"
+    //     element={
+    //       <RequireUnlocked>
+    //         <Home />
+    //       </RequireUnlocked>
+    //     }
+    //   />
+    // </Routes>
   );
 }
 

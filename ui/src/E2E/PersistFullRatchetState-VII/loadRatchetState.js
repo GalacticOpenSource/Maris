@@ -1,7 +1,9 @@
 import sodium from "libsodium-wrappers-sumo";
+
 export async function loadRatchetState(storageKey) {
-  await sodium.ready
-    const raw = localStorage.getItem("ratchetState");
+  await sodium.ready;
+
+  const raw = localStorage.getItem("ratchetState");
   if (!raw) return null;
 
   const { nonce, cipher } = JSON.parse(raw);
@@ -18,6 +20,8 @@ export async function loadRatchetState(storageKey) {
 
   const data = JSON.parse(sodium.to_string(plaintext));
 
+
+
   return {
     RK: sodium.from_base64(data.RK),
     CKs: sodium.from_base64(data.CKs),
@@ -32,6 +36,8 @@ export async function loadRatchetState(storageKey) {
 
     Ns: data.Ns,
     Nr: data.Nr,
+
+    pendingDH: data.pendingDH ?? false,
 
     skippedKeys: new Map(
       data.skippedKeys.map(([k, v]) => [k, sodium.from_base64(v)])

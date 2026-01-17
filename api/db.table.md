@@ -73,7 +73,7 @@ who (user)
 from where (device)
 
 # 5
-
+identity_keys 
 CREATE TABLE identity_keys (
 device_id UUID PRIMARY KEY REFERENCES devices(id) ON DELETE CASCADE,
 

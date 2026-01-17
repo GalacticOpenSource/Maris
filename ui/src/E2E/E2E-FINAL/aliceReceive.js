@@ -4,7 +4,7 @@ import { trySkippedKey } from "../E2E-receiveMessage-I/Helpers/trySkippedKey";
 import { decryptWithMK } from "../E2E-receiveMessage-I/Helpers/decryptWithMK";
 import { storeSkippedKey } from "../E2E-receiveMessage-I/Helpers/storeSkippedKey";
 import { persistRatchetState } from "../PersistFullRatchetState-VII/persistRatchetState";
-
+import { kdfRK } from "../E2E-PHASE-VII/kdfRK";
 // ✔ Same dhRatchet for Alice & Bob
 // ✔ Same aliceReceive / bobReceive logic
 // ✔ Same aliceSend / bobSend logic
@@ -58,14 +58,13 @@ export async function aliceReceive(state, message, storageKey) {
   /* 3. NEW DH detected → derive RECEIVING chain        */
   /* -------------------------------------------------- */
 
-  const isNewDh =
-    !state.DHr || !sodium.memcmp(state.DHr, senderDh);
+  const isNewDh = !state.DHr || !sodium.memcmp(state.DHr, senderDh);
 
   if (isNewDh) {
     // DH = DH(local private DH, peer public DH)
     const DH = sodium.crypto_scalarmult(
       state.DHs.privateKey, // Alice current private DH
-      senderDh              // Bob public DH
+      senderDh // Bob public DH
     );
 
     // Advance root key and derive NEW receiving chain
@@ -77,7 +76,6 @@ export async function aliceReceive(state, message, storageKey) {
 
     // Store peer DH and mark pending send-side ratchet
     state.DHr = senderDh;
-    state.pendingDH = true;
 
     persistRatchetState(state, storageKey);
   }
@@ -110,7 +108,7 @@ export async function aliceReceive(state, message, storageKey) {
 
   const plaintext = decryptWithMK(MK, body);
   state.usedMessageKeys.add(replayKey);
- state.pendingDH = true; // receiving always triggers next-send DH
+  state.pendingDH = true; // receiving always triggers next-send DH
 
   persistRatchetState(state, storageKey);
 

@@ -1,6 +1,6 @@
 export async function oneTimePrekeysLow(){
 
-    const res = await fetch("/keys/one-time-prekeys/status",{
+    const res = await fetch("http://localhost:3000/keys/one-time-prekeys/status",{
           credentials: "include"
     })
 
