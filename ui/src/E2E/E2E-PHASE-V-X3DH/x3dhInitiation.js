@@ -2,11 +2,11 @@ import sodium from "libsodium-wrappers-sumo";
 import { hkdfSHA256 } from "./hkdfSHA256.js";
 
 export async function x3dhInitiation(
-  I_A1 , // Alice identity keypair (Ed25519)
+  I_A1, // Alice identity keypair (Ed25519)
   I_B_pub1, // Bob identity public key (Ed25519)
   S_B_pub1, // Bob signed prekey public (X25519)
   S_B_sig1, // Signature over S_B_pub
-  O_B_pub1 = null, // Bob one-time prekey public (X25519 | null)
+  O_B_pub1 = null // Bob one-time prekey public (X25519 | null)
 ) {
   await sodium.ready;
 
@@ -20,31 +20,38 @@ export async function x3dhInitiation(
     }
     return out;
   }
- 
-  const I_A =  sodium.from_base64(I_A1)
-  const S_B_pub = sodium.from_base64(S_B_pub1)
-  const O_B_pub = sodium.from_base64(O_B_pub1)
-const I_B_pub = sodium.from_base64(I_B_pub1)
-//   const valid = sodium.crypto_sign_verify_detached(S_B_sig, S_B_pub, I_B_pub);
 
-//   if (!valid) {
-//     throw new Error("Invalid signed prekey signature");
-//   }
+  const I_A = I_A1;
+  const S_B_pub = sodium.from_base64(S_B_pub1);
+  const S_B_sig = sodium.from_base64(S_B_sig1);
+  const O_B_pub = sodium.from_base64(O_B_pub1);
+  const I_B_pub = sodium.from_base64(I_B_pub1);
+
+  const valid = sodium.crypto_sign_verify_detached(
+    S_B_sig, // from server
+    S_B_pub, // from server
+    I_B_pub // from server
+  );
+
+  if (!valid) {
+    throw new Error("Signed prekey is NOT authentic");
+  }
+
   const E_A = sodium.crypto_kx_keypair(); // X25519
 
   // libsodium safely converts:
-//Ed25519 ↔ Curve25519
-//That’s why these functions exist:
-//crypto_sign_ed25519_sk_to_curve25519
-//crypto_sign_ed25519_pk_to_curve25519
+  //Ed25519 ↔ Curve25519
+  //That’s why these functions exist:
+  //crypto_sign_ed25519_sk_to_curve25519
+  //crypto_sign_ed25519_pk_to_curve25519
 
-// Ed25519 identity keypair
- // ├── private (scalar-ish) ──▶ sk_to_curve25519 ──▶ X25519 scalar
- // └── public (point)       ──▶ pk_to_curve25519 ──▶ X25519 point
+  // Ed25519 identity keypair
+  // ├── private (scalar-ish) ──▶ sk_to_curve25519 ──▶ X25519 scalar
+  // └── public (point)       ──▶ pk_to_curve25519 ──▶ X25519 point
   const I_A_curve = sodium.crypto_sign_ed25519_sk_to_curve25519(I_A);
-const I_B_curve = sodium.crypto_sign_ed25519_pk_to_curve25519(I_B_pub);
+  const I_B_curve = sodium.crypto_sign_ed25519_pk_to_curve25519(I_B_pub);
 
-//X25519 scalar × X25519 point = shared secret
+  //X25519 scalar × X25519 point = shared secret
   // DH1 = DH(IK_A, SPK_B) this operation only works on Curve25519 (X25519)
   const dh1 = sodium.crypto_scalarmult(I_A_curve, S_B_pub);
 
@@ -75,20 +82,16 @@ const I_B_curve = sodium.crypto_sign_ed25519_pk_to_curve25519(I_B_pub);
   /* 6. CLEANUP                                         */
   /* -------------------------------------------------- */
 
-  E_A.privateKey.fill(0);
   I_A_curve.fill(0);
 
   /* -------------------------------------------------- */
   /* 7. OUTPUT (WHAT ALICE SENDS TO BOB)                 */
   /* -------------------------------------------------- */
-// console.log(ikm,RK,CK,sodium.to_base64(E_A.publicKey))
+  // console.log(ikm,RK,CK,sodium.to_base64(E_A.publicKey))
+
   return {
-    rootKey:  sodium.to_base64(RK),
-    chainKey:  sodium.to_base64(CK),
-ikm : sodium.to_base64(ikm), // after work remove this 
-    header: {
-      ephPub: sodium.to_base64(E_A.publicKey),
-      usedOneTimePrekey: !!O_B_pub,
-    },
+    RK,
+    CK,
+   E_A
   };
 }

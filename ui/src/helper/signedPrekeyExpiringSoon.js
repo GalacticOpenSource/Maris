@@ -1,5 +1,5 @@
 export async function signedPrekeyExpiringSoon() {
-  const res = await fetch("keys/signed-prekey/latest", {
+  const res = await fetch("http://localhost:3000/keys/signed-prekey/latest", {
     credentials: "include",
   });
   const spk = await res.json();

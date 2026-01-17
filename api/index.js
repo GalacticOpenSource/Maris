@@ -5,16 +5,27 @@ import requestOtp from "./Register/requestOtp.js";
 import verifyOTP from "./Register/verifyOTP.js";
 import router from "./routes/keys.js";
 import pool from "./Db/db.js";
+import key from "./keyBundle/Alice_Bob.js";
 const app = express();
 const port = 3000;
+const allowedOrigins = ["http://localhost:5173", "http://localhost:5174"];
+
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:5173");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Credentials", "true"); // 🔥 REQUIRED
+  const origin = req.headers.origin;
+
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
 
   if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
+    return res.sendStatus(204); // better than 200
   }
 
   next();
@@ -22,7 +33,7 @@ app.use((req, res, next) => {
 
 app.use(express.json({ limit: "50kb" }));
 app.use(cookieParser());
-export  async function auth(req, res, next) {
+export async function auth(req, res, next) {
   const token = req.cookies.session;
   console.log(token);
   if (!token) return res.sendStatus(401);
@@ -59,6 +70,15 @@ app.use(auth);
 /* ---------- PROTECTED ROUTES ---------- */
 // app.use("/devices", devicesRouter);
 // app.use("/messages", messagesRouter);
+
+app.use(
+  "/bundle",
+  (req, res, next) => {
+    console.log("deviceId", req.params);
+    next();
+  },
+  key
+);
 app.get("/hi", (req, res) => {
   res.send("<h1>Hello</h1>");
 });
@@ -96,14 +116,14 @@ app.get("/devices", async (req, res) => {
     `,
     [req.userId]
   );
-  res.json({devices:rows})
+  res.json({ devices: rows });
 });
-app.get("/me",async (req,res) => {
-    res.json({
+app.get("/me", async (req, res) => {
+  res.json({
     userId: req.userId,
-    deviceId: req.deviceId
+    deviceId: req.deviceId,
   });
-})
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

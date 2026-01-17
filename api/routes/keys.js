@@ -4,8 +4,9 @@ import pool from "../Db/db.js";
 const router = express.Router();
 router.post("/identity", auth, async (req, res) => {
   console.log("running");
+  
   const { publicKey } = req.body;
-
+console.log(publicKey)
   await pool.query(
     `
     INSERT INTO identity_keys (device_id, public_key)
@@ -32,7 +33,7 @@ router.get("/signed-prekey/latest", auth, async (req, res) => {
   if (!rows.length) {
     return res.json(null);
   }
-  res.json(rows[0]);
+  res.json({ok :"sucesss"});
 });
 router.post("/signed-prekey", auth, async (req, res) => {
   const { publicKey, signature, expiresAt } = req.body;

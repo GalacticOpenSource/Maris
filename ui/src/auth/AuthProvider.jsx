@@ -10,7 +10,7 @@ export function   AuthProvider({ children }) {
    useEffect(()=>{
     async function checkSession() {
         try{
-            const res = fetch("http://localhost:3000/me",{
+            const res =  await fetch("http://localhost:3000/me",{
           credentials: "include"
         })
           if(res.ok){

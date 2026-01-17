@@ -1,28 +1,35 @@
 import sodium from "libsodium-wrappers-sumo";
 import { hkdfSHA256 } from "../E2E-PHASE-V-X3DH/hkdfSHA256";
 
-async function deriveCK(key, info) {
+async function deriveCK(RK, info) {
   const zeroSalt = new Uint8Array(32);
-  return hkdfSHA256(key, zeroSalt, info);
+  return hkdfSHA256(RK, zeroSalt, info);
 }
 
 export async function initDoubleRatchetAlice(RK, E_A) {
   await sodium.ready;
-  const RK_I = sodium.from_base64(RK);
-  const CKs = await deriveCK(RK_I, "DR Alice send");
-  const CKr = await deriveCK(RK_I, "DR Alice recv");
+
+  const CKs = await deriveCK(RK, "DR Alice send");
+  const CKr = await deriveCK(RK, "DR Alice recv");
 
   return {
-    RK: sodium.to_base64(RK_I),
-    CKr: sodium.to_base64(CKr),
-    CKs: sodium.to_base64(CKs),
+    /* Root + chains */
+    RK,
+    CKs,
+    CKr,
 
-    DHs: E_A, // Alice DH keypair (X25519)
-    DHr: null, // Bob has not replied yet
+    /* DH ratchet keys */
+    DHs: E_A, // Alice current DH keypair (X25519)
+    DHr: null, // Bob DH public key (unknown yet)
 
+    /* Message counters */
     Ns: 0,
     Nr: 0,
-    pendingDH: false, // ← REQUIRED
+
+    /* Control flags */
+    pendingDH: false,
+
+    /* Skipped / replay protection */
     skippedKeys: new Map(),
     usedMessageKeys: new Set(),
   };

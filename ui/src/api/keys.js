@@ -5,7 +5,7 @@ export async function uploadIdentityKey(publicKey) {
       "Content-Type": "application/json",
     },
     credentials: "include", // send session cookie
-    body: publicKey,
+    body:JSON.stringify({ publicKey}),
   });
 
   if (!res.ok) {

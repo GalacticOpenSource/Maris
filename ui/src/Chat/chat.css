@@ -1,0 +1,161 @@
+* {
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #111;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+  color: white;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 300px;
+  background: #1c1c1c;
+  padding: 12px;
+}
+
+.sidebar-header {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.search {
+  width: 100%;
+  padding: 8px;
+  background: #2a2a2a;
+  border: none;
+  border-radius: 8px;
+  color: white;
+}
+
+.chat-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.chat-item.active {
+  background: #2a2a2a;
+}
+
+.chat-item img {
+  border-radius: 50%;
+}
+
+/* Chat */
+.chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #121212;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.back {
+  display: none;
+  cursor: pointer;
+}
+
+.chat-header img {
+  border-radius: 50%;
+}
+
+.messages {
+  flex: 1;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.msg {
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+}
+
+.msg.sent {
+  background: #2f6fed;
+  align-self: flex-end;
+}
+
+.msg.received {
+  background: #2a2a2a;
+}
+
+.msg.file {
+  background: #244fd8;
+}
+
+.msg.voice {
+  background: #333;
+}
+
+/* Input bar */
+.input-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px;
+  border-top: 1px solid #2a2a2a;
+}
+
+.input-bar input {
+  flex: 1;
+  padding: 10px;
+  background: #2a2a2a;
+  border: none;
+  border-radius: 20px;
+  color: white;
+}
+
+.icon {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.send {
+  background: #2f6fed;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+}
+
+.mic {
+  font-size: 20px;
+}
+
+/* 📱 Mobile */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+
+  .back {
+    display: block;
+  }
+
+  .msg {
+    max-width: 85%;
+  }
+}

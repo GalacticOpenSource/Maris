@@ -6,8 +6,8 @@ import { AuthProvider } from "./auth/AuthProvider.jsx";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <AuthProvider>
+    {/* <AuthProvider> */}
       <App />
-    </AuthProvider>
+    {/* </AuthProvider> */}
   </BrowserRouter>
 );

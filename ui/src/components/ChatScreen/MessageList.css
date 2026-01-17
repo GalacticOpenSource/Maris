@@ -1,0 +1,17 @@
+.message-list {
+  overflow-y: auto;
+  padding-bottom: 12px;
+}
+.date-separator {
+  text-align: center;
+  margin: 12px 0;
+  font-size: 12px;
+  opacity: 0.6;
+}
+.message-list {
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.02),
+    rgba(255,255,255,0)
+  );
+}

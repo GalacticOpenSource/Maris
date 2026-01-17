@@ -4,6 +4,7 @@ import { kdfRK } from "./kdfRK.js";
 import { trySkippedKey } from "./Helpers/trySkippedKey.js";
 import { decryptWithMK } from "./Helpers/decryptWithMK.js";
 import { storeSkippedKey } from "./Helpers/storeSkippedKey.js";
+import { kdfRK } from "../E2E-PHASE-VII/kdfRK.js";
 import { persistRatchetState } from "../PersistFullRatchetState-VII/persistRatchetState.js";
 
 async function nextMessageKey(CK) {
